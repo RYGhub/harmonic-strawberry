@@ -1,0 +1,30 @@
+{
+  "name": "harmonic-strawberry",
+  "version": "0.1.0",
+  "description": "Discord interface to impressive-strawberry",
+  "main": "src/index.ts",
+  "scripts": {
+    "start": "ts-node src/index.ts"
+  },
+  "keywords": [
+    "discord-bot",
+    "strawberry",
+    "achievements"
+  ],
+  "author": {
+    "name": "Stefano Pigozzi",
+    "url": "https://steffo.eu",
+    "email": "me@steffo.eu"
+  },
+  "license": "AGPL-3.0-or-later",
+  "devDependencies": {
+    "@types/node": "^17.0.6",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.5.4"
+  },
+  "dependencies": {
+    "@discordjs/builders": "^0.11.0",
+    "axios": "^0.24.0",
+    "discord.js": "^13.5.0"
+  }
+}
