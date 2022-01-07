@@ -4,13 +4,14 @@ import {env} from "./env"
 export const url = env.IS_API_URL
 export const token = env.IS_API_TOKEN
 
-console.info("Creating API client for Impressive Strawberry at", url)
-
-export const api = Axios.create({
+export const rest = Axios.create({
     baseURL: url,
     headers: {
         "Authorization": `Bearer ${token}`
     }
 })
 
-console.info("Creation complete!")
+export async function editResource<T>(url, data, options) {
+    const initialResponse = await rest.get<T>(url, options)
+    return await rest.put<T>(url, {...initialResponse.data, ...data}, options)
+}

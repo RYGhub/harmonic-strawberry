@@ -1,3 +1,4 @@
+import {AxiosError} from "axios"
 import {ColorResolvable, MessageEmbed} from "discord.js"
 import {AchievementFull} from "./types"
 
@@ -19,7 +20,7 @@ const ALLOY_COLORS: {[_: string]: ColorResolvable} = {
     "GOLD": "#ffac33",
 }
 
-export function renderAchievement(achievement: AchievementFull, full: boolean): MessageEmbed {
+export function renderAchievementEmbed(achievement: AchievementFull, full: boolean): MessageEmbed {
     let embed = new MessageEmbed()
 
     embed = embed.setTitle(achievement.name)
@@ -54,4 +55,8 @@ export function renderAchievement(achievement: AchievementFull, full: boolean): 
     }
 
     return embed
+}
+
+export function renderImpressiveError(error: AxiosError): string {
+    return `:warning: ${error.response.data.reason}`
 }

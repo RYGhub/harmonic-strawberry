@@ -1,13 +1,3 @@
-import {connect} from "./discord"
+import {run} from "./discord"
 
-
-const main = async () => {
-    await connect()
-}
-
-
-main().finally(
-    () => {
-        console.warn("Main has exited.")
-    }
-)
+run().finally(() => console.warn("Main has exited."))
