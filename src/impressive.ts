@@ -1,7 +1,8 @@
 import {Axios} from "axios"
+import {env} from "./env"
 
-export const url = process.env.HS_API_URL
-export const token = process.env.HS_API_TOKEN
+export const url = env.HS_API_URL
+export const token = env.HS_API_TOKEN
 
 console.info("Creating API client for Impressive Strawberry at", url)
 
