@@ -1,8 +1,8 @@
 import {SlashCommandBuilder} from "@discordjs/builders"
-import {ChannelType} from "discord-api-types"
+import {ChannelType} from "discord-api-types/v9"
 
 
-const setup = new SlashCommandBuilder()
+export const setup = new SlashCommandBuilder()
     .setName("setup")
     .setDescription("Setup the Strawberry webhook for this Server.")
     .setDefaultPermission(true)
@@ -20,13 +20,13 @@ const setup = new SlashCommandBuilder()
     )
 
 
-const list = new SlashCommandBuilder()
+export const list = new SlashCommandBuilder()
     .setName("list")
     .setDescription("List all achievements.")
     .setDefaultPermission(false)
 
 
-const create = new SlashCommandBuilder()
+export const create = new SlashCommandBuilder()
     .setName("create")
     .setDescription("Create a new achievement.")
     .setDefaultPermission(false)
@@ -67,7 +67,7 @@ const create = new SlashCommandBuilder()
     )
 
 
-const edit = new SlashCommandBuilder()
+export const edit = new SlashCommandBuilder()
     .setName("edit")
     .setDescription("Edit an existing achievement.")
     .setDefaultPermission(false)
@@ -108,7 +108,7 @@ const edit = new SlashCommandBuilder()
     )
 
 
-const delete_ = new SlashCommandBuilder()
+export const delete_ = new SlashCommandBuilder()
     .setName("delete")
     .setDescription("Delete an existing achievement, and all its associated unlocks.")
     .setDefaultPermission(false)
@@ -119,7 +119,7 @@ const delete_ = new SlashCommandBuilder()
     )
 
 
-const view = new SlashCommandBuilder()
+export const view = new SlashCommandBuilder()
     .setName("view")
     .setDescription("View all unlocks of a certain user, or your own if no user is specified.")
     .setDefaultPermission(false)
@@ -130,7 +130,7 @@ const view = new SlashCommandBuilder()
     )
 
 
-const unlock = new SlashCommandBuilder()
+export const unlock = new SlashCommandBuilder()
     .setName("unlock")
     .setDescription("Unlock an achievement for an user.")
     .setDefaultPermission(false)
@@ -146,7 +146,7 @@ const unlock = new SlashCommandBuilder()
     )
 
 
-const relock = new SlashCommandBuilder()
+export const relock = new SlashCommandBuilder()
     .setName("relock")
     .setDescription("Undo the latest unlock of an achievement for an user.")
     .setDefaultPermission(false)
@@ -160,3 +160,15 @@ const relock = new SlashCommandBuilder()
         .setDescription("The ID of the unlocked achievement.")
         .setRequired(true)
     )
+
+
+export default [
+    setup,
+    list,
+    create,
+    edit,
+    delete_,
+    view,
+    unlock,
+    relock,
+]

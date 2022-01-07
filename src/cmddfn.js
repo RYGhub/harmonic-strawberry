@@ -1,7 +1,8 @@
 "use strict";
 exports.__esModule = true;
+exports.relock = exports.unlock = exports.view = exports.delete_ = exports.edit = exports.create = exports.list = exports.setup = void 0;
 var builders_1 = require("@discordjs/builders");
-var setup = new builders_1.SlashCommandBuilder()
+exports.setup = new builders_1.SlashCommandBuilder()
     .setName("setup")
     .setDescription("Setup the Strawberry webhook for this Server.")
     .setDefaultPermission(true)
@@ -15,11 +16,11 @@ var setup = new builders_1.SlashCommandBuilder()
     .setName("role")
     .setDescription("The role that users must have to administrate achievements.")
     .setRequired(true); });
-var list = new builders_1.SlashCommandBuilder()
+exports.list = new builders_1.SlashCommandBuilder()
     .setName("list")
     .setDescription("List all achievements.")
     .setDefaultPermission(false);
-var create = new builders_1.SlashCommandBuilder()
+exports.create = new builders_1.SlashCommandBuilder()
     .setName("create")
     .setDescription("Create a new achievement.")
     .setDefaultPermission(false)
@@ -52,7 +53,7 @@ var create = new builders_1.SlashCommandBuilder()
     .setName("repeatable")
     .setDescription("Whether the achievement can be repeatedly unlocked or not.")
     .setRequired(true); });
-var edit = new builders_1.SlashCommandBuilder()
+exports.edit = new builders_1.SlashCommandBuilder()
     .setName("edit")
     .setDescription("Edit an existing achievement.")
     .setDefaultPermission(false)
@@ -85,7 +86,7 @@ var edit = new builders_1.SlashCommandBuilder()
     .setName("repeatable")
     .setDescription("The new repeatability value of the achievement. (Previous unlocks won't be reversed.)")
     .setRequired(true); });
-var delete_ = new builders_1.SlashCommandBuilder()
+exports.delete_ = new builders_1.SlashCommandBuilder()
     .setName("delete")
     .setDescription("Delete an existing achievement, and all its associated unlocks.")
     .setDefaultPermission(false)
@@ -93,7 +94,7 @@ var delete_ = new builders_1.SlashCommandBuilder()
     .setName("crystal")
     .setDescription("The ID of the achievement to delete.")
     .setRequired(true); });
-var view = new builders_1.SlashCommandBuilder()
+exports.view = new builders_1.SlashCommandBuilder()
     .setName("view")
     .setDescription("View all unlocks of a certain user, or your own if no user is specified.")
     .setDefaultPermission(false)
@@ -101,7 +102,7 @@ var view = new builders_1.SlashCommandBuilder()
     .setName("user")
     .setDescription("The user to view the unlocks of.")
     .setRequired(false); });
-var unlock = new builders_1.SlashCommandBuilder()
+exports.unlock = new builders_1.SlashCommandBuilder()
     .setName("unlock")
     .setDescription("Unlock an achievement for an user.")
     .setDefaultPermission(false)
@@ -113,7 +114,7 @@ var unlock = new builders_1.SlashCommandBuilder()
     .setName("crystal")
     .setDescription("The ID of the achievement to unlock.")
     .setRequired(true); });
-var relock = new builders_1.SlashCommandBuilder()
+exports.relock = new builders_1.SlashCommandBuilder()
     .setName("relock")
     .setDescription("Undo the latest unlock of an achievement for an user.")
     .setDefaultPermission(false)
@@ -125,3 +126,13 @@ var relock = new builders_1.SlashCommandBuilder()
     .setName("crystal")
     .setDescription("The ID of the unlocked achievement.")
     .setRequired(true); });
+exports["default"] = [
+    exports.setup,
+    exports.list,
+    exports.create,
+    exports.edit,
+    exports.delete_,
+    exports.view,
+    exports.unlock,
+    exports.relock,
+];
