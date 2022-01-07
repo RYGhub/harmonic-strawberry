@@ -10,8 +10,8 @@ export const setup = new SlashCommandBuilder()
         .setName("channel")
         .setDescription("The channel where achievement notifications should be sent in.")
         .setRequired(true)
-        .addChannelType(ChannelType.GuildText)
-        .addChannelType(ChannelType.GuildNews)
+        .addChannelType(0)
+        .addChannelType(5)
     )
     .addRoleOption(option => option
         .setName("role")
@@ -104,7 +104,7 @@ export const edit = new SlashCommandBuilder()
     .addBooleanOption(option => option
         .setName("repeatable")
         .setDescription("The new repeatability value of the achievement. (Previous unlocks won't be reversed.)")
-        .setRequired(true)
+        .setRequired(false)
     )
 
 

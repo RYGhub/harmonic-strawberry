@@ -1,8 +1,8 @@
-import * as Discord from "discord.js"
+import {connect} from "./discord"
 
 
 const main = async () => {
-
+    await connect()
 }
 
 
