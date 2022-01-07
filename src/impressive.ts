@@ -1,9 +1,15 @@
 import {Axios} from "axios"
 
+export const url = process.env.HS_API_URL
+export const token = process.env.HS_API_TOKEN
+
+console.info("Creating API client for Impressive Strawberry at", url)
 
 export const api = new Axios({
-    baseURL: process.env.HS_API_URL,
+    baseURL: url,
     headers: {
-        "Authorization": `Bearer ${process.env.HS_API_TOKEN}`
+        "Authorization": `Bearer ${token}`
     }
 })
+
+console.info("Creation complete!")
