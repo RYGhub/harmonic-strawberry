@@ -1,37 +1,26 @@
 import {AxiosResponse} from "axios"
-import {CommandInteraction, CommandInteractionOption, Interaction, Role, TextBasedChannel, TextChannel, Webhook} from "discord.js"
+import {Snowflake} from "discord-api-types/v9"
+import {ApplicationCommandPermissions, Collection, CommandInteraction, Guild, GuildApplicationCommandPermissionData, Interaction, Permissions, TextChannel, Webhook} from "discord.js"
+import {ApplicationCommandPermissionTypes} from "discord.js/typings/enums"
 import {api as isapi} from "./impressive"
 import {GroupFull, WebhookFull, WebhookKind} from "./types"
 import {rest as dsapi, client as dsclient} from "./discord"
 
 
+const HANDLERS = {
+    "setup": handleSetup,
+    "list": handleList,
+    "create": handleCreate,
+    "edit": handleEdit,
+    "delete": handleDelete,
+    "view": handleView,
+    "unlock": handleUnlock,
+    "relock": handleRelock,
+}
+
+
 export async function handleCommand(interaction: CommandInteraction): Promise<void> {
-    switch(interaction.commandName) {
-        case "setup":
-            await handleSetup(interaction);
-            break;
-        case "list":
-            await handleList(interaction);
-            break;
-        case "create":
-            await handleCreate(interaction);
-            break;
-        case "edit":
-            await handleEdit(interaction);
-            break;
-        case "delete":
-            await handleDelete(interaction);
-            break;
-        case "view":
-            await handleView(interaction);
-            break;
-        case "unlock":
-            await handleUnlock(interaction);
-            break;
-        case "relock":
-            await handleRelock(interaction);
-            break;
-    }
+    await HANDLERS[interaction.commandName](interaction)
 }
 
 async function findGuildGroup(interaction: Interaction): Promise<GroupFull> {
@@ -81,15 +70,61 @@ async function setupImpressiveWebhook(webhook: Webhook): Promise<WebhookFull> {
     return response.data
 }
 
+function createEmptyPermission(cmdId: Snowflake): GuildApplicationCommandPermissionData {
+    return {
+        id: cmdId,
+        permissions: [],
+    }
+}
+
+function createRolePermission(cmdId: Snowflake, roleId: Snowflake): GuildApplicationCommandPermissionData {
+    return {
+        id: cmdId,
+        permissions: [
+            {
+                id: roleId,
+                type: ApplicationCommandPermissionTypes.ROLE,
+                permission: true,
+            },
+        ],
+    }
+}
+
+async function setupCommandPermissions(guild: Guild, adminRoleId: Snowflake): Promise<Collection<string, ApplicationCommandPermissions[]>> {
+    const commands = await guild.commands.fetch()
+    const fullPermissions = commands.map<GuildApplicationCommandPermissionData>(cmd => {
+        if(["list", "view"].includes(cmd.name)) {
+            return createRolePermission(cmd.id, guild.id)
+        }
+        else if(["create", "edit", "delete", "unlock", "relock"].includes(cmd.name)) {
+            return createRolePermission(cmd.id, adminRoleId)
+        }
+        else {
+            return createEmptyPermission(cmd.id)
+        }
+    })
+    const result = await guild.commands.permissions.set({fullPermissions})
+    return result
+}
+
 async function handleSetup(interaction: CommandInteraction): Promise<void> {
+    const guild = await interaction.guild.fetch()
+    const member = await guild.members.fetch(interaction.user.id)
+    if(!member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) {
+        await interaction.reply({
+            content: ":warning: You do not have the required permissions to setup the bot. To do that, you need the `Administrator` permission.",
+            ephemeral: true,
+        })
+        return
+    }
+
     const group = findGuildGroup(interaction)
     const channel = await findTargetChannel(interaction)
     const dsWebhook = await setupDiscordWebhook(channel)
     const isWebhook = await setupImpressiveWebhook(dsWebhook)
+    const permissions = await setupCommandPermissions(guild, interaction.options.get("role").role.id)
 
-    const role = interaction.options.get("role").role.id
-
-    await interaction.reply("kind of done")
+    await interaction.reply(`:hammer: Set up achievements in channel <#${channel.id}> and enabled the other Strawberry commands!`)
 }
 
 async function handleList(interaction: CommandInteraction): Promise<void> {
