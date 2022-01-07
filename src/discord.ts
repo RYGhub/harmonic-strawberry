@@ -2,6 +2,7 @@ import {REST} from "@discordjs/rest"
 import {env} from "./env"
 import {Client, Intents} from "discord.js"
 import {registerGuild} from "./cmdregister"
+import {handleCommand} from "./cmdhandle"
 
 
 const client = new Client({
@@ -20,7 +21,8 @@ client.on("ready", async () => {
 })
 
 client.on("interactionCreate", async interaction => {
-    if (!interaction.isCommand()) return;
-    await interaction.reply("sì")
+    if (interaction.isCommand()) {
+        handleCommand(interaction)
+    }
 })
 

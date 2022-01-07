@@ -1,4 +1,5 @@
 import {CommandInteraction} from "discord.js"
+import {api} from "./impressive"
 
 
 export function handleCommand(interaction: CommandInteraction): void {
@@ -15,7 +16,7 @@ export function handleCommand(interaction: CommandInteraction): void {
 }
 
 function handleSetup(interaction: CommandInteraction): void {
-    
+    interaction.reply("no u")
 }
 
 function handleList(interaction: CommandInteraction): void {
