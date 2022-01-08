@@ -4,12 +4,12 @@ export type DateString = string
 
 export type StrawberryModel = {}
 
-export type ApplicationEdit = {
+export type ApplicationEdit = StrawberryModel & {
     name: string
     description: string
 }
 
-export type GroupEdit = {
+export type GroupEdit = StrawberryModel & {
     crystal: Crystal
 }
 
@@ -18,7 +18,7 @@ export enum WebhookKind {
     DISCORD = "DISCORD",
 }
 
-export type WebhookEdit = {
+export type WebhookEdit = StrawberryModel & {
     url: string
     kind: WebhookKind
 }
@@ -29,7 +29,7 @@ export enum Alloy {
     GOLD = "GOLD",
 }
 
-export type AchievementEdit = {
+export type AchievementEdit = StrawberryModel & {
     name: string
     description: string
     alloy: Alloy
@@ -39,12 +39,12 @@ export type AchievementEdit = {
     crystal: Crystal
 }
 
-export type UnlockEdit = {
+export type UnlockEdit = StrawberryModel & {
     achievement_id: UUID
     user_id: UUID
 }
 
-export type UserEdit = {
+export type UserEdit = StrawberryModel & {
     crystal: Crystal
 }
 
