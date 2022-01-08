@@ -1,6 +1,6 @@
 import {AxiosError} from "axios"
 import {CommandInteraction, Permissions, TextChannel} from "discord.js"
-import {makeGuildGroup} from "./make"
+import {makeGroup, makeGuildGroup, makeUser, makeUserUser} from "./make"
 import {renderAchievementEmbed, renderImpressiveError} from "./render"
 import {linkImpressiveWebhook, setCommandPermissions, setupDiscordWebhook} from "./setup"
 import {AchievementFull} from "./types"
@@ -21,12 +21,11 @@ const HANDLERS = {
 
 
 export async function handleCommand(interaction: CommandInteraction): Promise<void> {
-    console.debug("[Handler/Command] Handling a command interaction:", interaction)
+    console.debug("[Handler/Command] Handling a command interaction...")
     try {
         await HANDLERS[interaction.commandName](interaction)
     }
     catch (error) {
-        console.error("[Handler/Command] Error:", error)
         await handleImpressiveError(interaction, error)
     }
 }
@@ -36,12 +35,18 @@ async function handleImpressiveError(interaction: CommandInteraction, error: Axi
     console.debug("[Handler/Command/ImpressiveError] Trying to reply to the interaction with the error...")
     const errorMessage = renderImpressiveError(error)
     try {
-        await interaction.reply(errorMessage)
+        await interaction.reply({
+            content: errorMessage,
+            ephemeral: true,
+        })
     }
     catch(_) {
         console.debug("[Handler/Command/ImpressiveError] Cannot reply with the error, trying to follow up...")
         try {
-            await interaction.followUp(errorMessage)
+            await interaction.followUp({
+                content: errorMessage,
+                ephemeral: true,
+            })
         }
         catch(_) {
             console.warn("[Handler/Command/ImpressiveError] Cannot follow up with the error, giving up...")
@@ -65,7 +70,7 @@ async function handleSetup(interaction: CommandInteraction): Promise<void> {
         return
     }
 
-    const group = await makeGuildGroup(interaction)
+    const group = await makeGroup(interaction.guildId)
     const channel = await findTargetChannel(interaction)
     const dsWebhook = await setupDiscordWebhook(channel)
     const isWebhook = await linkImpressiveWebhook(dsWebhook)
@@ -86,6 +91,14 @@ async function handleList(interaction: CommandInteraction): Promise<void> {
 
     const achievements = response.data
     const embeds = achievements.map(ach => renderAchievementEmbed(ach, true))
+
+    if(embeds.length === 0) {
+        await interaction.reply({
+            content: ":cloud: This server has no achievements.",
+            ephemeral: true,
+        })
+        return
+    }
 
     const expectedMessages = Math.ceil(embeds.length / 10)
     for(let msgNo = 0; msgNo < expectedMessages; msgNo++) {
@@ -168,7 +181,21 @@ async function handleView(interaction: CommandInteraction): Promise<void> {
 }
 
 async function handleUnlock(interaction: CommandInteraction): Promise<void> {
+    const crystal = interaction.options.get("crystal").value
+    const user = await makeUser(interaction.options.get("user").user.id)
 
+    const response = await impressiveRest.post("/api/unlock/v1/", {}, {
+        params: {
+            achievement: crystal,
+            group: interaction.guildId,
+            user: user,
+        }
+    })
+
+    await interaction.reply({
+        content: `:unlock: Unlocked achievement \`${crystal}\` for <@${user}>!`,
+        ephemeral: true,
+    })
 }
 
 async function handleRelock(interaction: CommandInteraction): Promise<void> {
