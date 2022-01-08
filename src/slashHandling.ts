@@ -1,6 +1,6 @@
 import {AxiosError} from "axios"
 import {CommandInteraction, Permissions, TextChannel} from "discord.js"
-import {makeGroup, makeGuildGroup, makeUser, makeUserUser} from "./make"
+import {makeGroup, makeUser} from "./make"
 import {renderAchievementEmbed, renderImpressiveError} from "./render"
 import {linkImpressiveWebhook, setCommandPermissions, setupDiscordWebhook} from "./setup"
 import {AchievementFull} from "./types"
