@@ -2,7 +2,7 @@ import {AxiosError} from "axios"
 import {Collection, CommandInteraction, Permissions, TextChannel} from "discord.js"
 import {makeGroup, makeUser} from "./make"
 import {renderAchievementEmbed, renderImpressiveError, renderMultilineCode, renderUnlockEmbed} from "./render"
-import {linkImpressiveWebhook, setCommandPermissions, setupDiscordWebhook} from "./setup"
+import {linkImpressiveWebhook, setGlobalCommandPermissions, setGuildCommandPermissions, setupDiscordWebhook} from "./setup"
 import {AchievementFull, UnlockFull, Alloy} from "./types"
 import {client as dsclient} from "./discord"
 import {editResource, rest as impressiveRest} from "./impressive"
@@ -74,7 +74,7 @@ async function handleSetup(interaction: CommandInteraction): Promise<void> {
     const channel = await findTargetChannel(interaction)
     const dsWebhook = await setupDiscordWebhook(channel)
     const isWebhook = await linkImpressiveWebhook(dsWebhook)
-    const permissions = await setCommandPermissions(guild, interaction.options.get("role").role.id)
+    const permissions = await setGlobalCommandPermissions(guild, interaction.options.get("role").role.id)
 
     await interaction.reply({
         content: `:hammer: Set up achievements in channel <#${channel.id}> and enabled the other Strawberry commands!`,
