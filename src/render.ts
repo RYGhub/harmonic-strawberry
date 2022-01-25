@@ -1,6 +1,6 @@
 import {AxiosError} from "axios"
 import {ColorResolvable, MessageEmbed} from "discord.js"
-import {AchievementFull} from "./types"
+import {AchievementRead, UnlockFull, Alloy} from "./types"
 
 const ALLOY_EMOJIS = {
     "BRONZE": ":third_place:",
@@ -20,43 +20,84 @@ const ALLOY_COLORS: {[_: string]: ColorResolvable} = {
     "GOLD": "#ffac33",
 }
 
-export function renderAchievementEmbed(achievement: AchievementFull, full: boolean): MessageEmbed {
+export function renderStrawberryTimestamp(timestamp: number, style: string = "f"): string {
+    return `<t:${Math.floor(timestamp)}:${style}>`
+}
+
+export function renderMultilineSpoiler(str: string): string {
+    return str.split("\n").map(line => `||${line}||`).join("\n")
+}
+
+export function renderMultilineDescription(description: string, secret: boolean): string {
+    if(secret) {
+        return renderMultilineSpoiler(description)
+    }
+    else {
+        return description
+    }
+}
+
+export function renderMultilineCode(text: string, language: string = ""): string {
+    return `\`\`\`${language}\n${text}\n\`\`\``
+}
+
+export function renderCrystalField(crystal: string): string {
+    return `:crystal_ball: \`${crystal}\``
+}
+
+export function renderAlloyField(alloy: Alloy): string {
+    return `${ALLOY_EMOJIS[alloy]} ${ALLOY_NAMES[alloy]}`
+}
+
+export function renderRepeatableField(repeatable: boolean): string {
+    if(repeatable) {
+        return ":repeat_one: Yes"
+    }
+    else {
+        return ":one: No"
+    }
+}
+
+export function renderSecretField(secret: boolean): string {
+    if(secret) {
+        return ":key: Yes"
+    }
+    else {
+        return ":newspaper: No"
+    }
+}
+
+export function renderAchievementEmbed(achievement: AchievementRead, full: boolean): MessageEmbed {
     let embed = new MessageEmbed()
 
     embed = embed.setTitle(achievement.name)
-
-    if(achievement.secret) {
-        embed = embed.setDescription(achievement.description.split("\n").map(line => `||${line}||`).join("\n"))
-    }
-    else {
-        embed = embed.setDescription(achievement.description)
-    }
-
     embed = embed.setColor(ALLOY_COLORS[achievement.alloy])
+    embed = embed.setDescription(renderMultilineDescription(achievement.description, achievement.secret))
 
     if(full) {
-        embed = embed.addField("Crystal", `:crystal_ball: \`${achievement.crystal}\``, true)
-
-        embed = embed.addField("Alloy", `${ALLOY_EMOJIS[achievement.alloy]} ${ALLOY_NAMES[achievement.alloy]}`, true)
-
-        if(achievement.repeatable) {
-            embed = embed.addField("Repeatable", ":repeat_one: Yes", true)
-        }
-        else {
-            embed = embed.addField("Repeatable", ":one: No", true)
-        }
-
-        if(achievement.secret) {
-            embed = embed.addField("Secret", ":key: Yes", true)
-        }
-        else {
-            embed = embed.addField("Secret", ":newspaper: No", true)
-        }
+        embed = embed.addField("Crystal", renderCrystalField(achievement.crystal), true)
+        embed = embed.addField("Alloy", renderAlloyField(achievement.alloy), true)
+        embed = embed.addField("Repeatable", renderRepeatableField(achievement.repeatable), true)
+        embed = embed.addField("Secret", renderSecretField(achievement.secret), true)
     }
 
     return embed
 }
 
+
+export function renderUnlockEmbed(unlock: UnlockFull) {
+    const achievement = unlock.achievement
+
+    let embed = renderAchievementEmbed(achievement, false)
+
+    embed.addField("Unlocked by", `:bust_in_silhouette: <@${unlock.user.crystal}>`, true)
+    embed.addField("Unlocked on", `:clock3: ${renderStrawberryTimestamp(unlock.timestamp, "d")}`, true)
+
+    return embed
+}
+
+
 export function renderImpressiveError(error: AxiosError): string {
-    return `:warning: ${error.response.data.reason}`
+    console.warn(`[Render/ImpressiveError] Error: ${error}`)
+    return `:warning: ${error}`
 }

@@ -11,7 +11,12 @@ export const rest = Axios.create({
     }
 })
 
-export async function editResource<T>(url, data, options) {
+export async function editResource<T extends {}>(url: string, data: Partial<T>, options): Promise<T> {
+    console.debug("[Impressive] Editing resource:", url)
     const initialResponse = await rest.get<T>(url, options)
-    return await rest.put<T>(url, {...initialResponse.data, ...data}, options)
+
+    const newObject = Object.fromEntries(Object.entries(data).filter(([_, v]) => v !== undefined))
+    const secondResponse = await rest.put<T>(url, {...initialResponse.data, ...newObject}, options)
+
+    return secondResponse.data
 }

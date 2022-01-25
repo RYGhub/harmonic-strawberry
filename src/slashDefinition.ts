@@ -145,22 +145,6 @@ export const unlock = new SlashCommandBuilder()
     )
 
 
-export const relock = new SlashCommandBuilder()
-    .setName("relock")
-    .setDescription("Undo the latest unlock of an achievement for an user.")
-    .setDefaultPermission(false)
-    .addUserOption(option => option
-        .setName("user")
-        .setDescription("The user to undo the unlock of.")
-        .setRequired(true)
-    )
-    .addStringOption(option => option
-        .setName("crystal")
-        .setDescription("The ID of the unlocked achievement.")
-        .setRequired(true)
-    )
-
-
 export default [
     setup,
     list,
@@ -169,5 +153,4 @@ export default [
     delete_,
     view,
     unlock,
-    relock,
 ]

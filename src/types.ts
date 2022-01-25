@@ -1,6 +1,5 @@
 export type UUID = string
 export type Crystal = string
-export type DateString = string
 
 export type StrawberryModel = {}
 
@@ -71,7 +70,7 @@ export type AchievementRead = AchievementEdit & {
 
 export type UnlockRead = UnlockEdit & {
     id: UUID
-    timestamp: DateString
+    timestamp: number
 }
 
 export type UserRead = UserEdit & {
@@ -101,4 +100,9 @@ export type AchievementFull = AchievementRead & {
 export type UserFull = UserRead & {
     application: ApplicationRead
     unlocks: UnlockRead[]
+}
+
+export type UnlockFull = UnlockRead & {
+    achievement: AchievementRead
+    user: UserRead
 }

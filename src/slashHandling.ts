@@ -1,11 +1,12 @@
 import {AxiosError} from "axios"
-import {CommandInteraction, Permissions, TextChannel} from "discord.js"
+import {Collection, CommandInteraction, Permissions, TextChannel} from "discord.js"
 import {makeGroup, makeUser} from "./make"
-import {renderAchievementEmbed, renderImpressiveError} from "./render"
+import {renderAchievementEmbed, renderImpressiveError, renderMultilineCode, renderUnlockEmbed} from "./render"
 import {linkImpressiveWebhook, setCommandPermissions, setupDiscordWebhook} from "./setup"
-import {AchievementFull} from "./types"
+import {AchievementFull, UnlockFull, Alloy} from "./types"
 import {client as dsclient} from "./discord"
 import {editResource, rest as impressiveRest} from "./impressive"
+import { unlock } from "./slashDefinition"
 
 
 const HANDLERS = {
@@ -16,12 +17,11 @@ const HANDLERS = {
     "delete": handleDelete,
     "view": handleView,
     "unlock": handleUnlock,
-    "relock": handleRelock,
 }
 
 
 export async function handleCommand(interaction: CommandInteraction): Promise<void> {
-    console.debug("[Handler/Command] Handling a command interaction...")
+    console.debug("[Handler/Command] Handling a command interaction:", interaction.commandName)
     try {
         await HANDLERS[interaction.commandName](interaction)
     }
@@ -81,6 +81,7 @@ async function handleSetup(interaction: CommandInteraction): Promise<void> {
         ephemeral: true,
     })
 }
+
 
 async function handleList(interaction: CommandInteraction): Promise<void> {
     const response = await impressiveRest.get<AchievementFull[]>("/api/achievement/v1/", {
@@ -142,19 +143,18 @@ async function handleCreate(interaction: CommandInteraction): Promise<void> {
 
 async function handleEdit(interaction: CommandInteraction): Promise<void> {
     const crystal = interaction.options.get("crystal").value
-    const response = await editResource<AchievementFull>(`/api/achievement/v1/${crystal}`, {
-        name: interaction.options.get("name")?.value,
-        description: interaction.options.get("description")?.value,
-        alloy: interaction.options.get("alloy")?.value,
-        secret: interaction.options.get("secret")?.value,
-        repeatable: interaction.options.get("repeatable")?.value,
+    const achievement = await editResource<AchievementFull>(`/api/achievement/v1/${crystal}`, {
+        name: interaction.options.get("name")?.value as string,
+        description: interaction.options.get("description")?.value as string,
+        alloy: interaction.options.get("alloy")?.value as Alloy,
+        secret: interaction.options.get("secret")?.value as boolean,
+        repeatable: interaction.options.get("repeatable")?.value as boolean,
     }, {
         params: {
             group: interaction.guildId,
         }
     })
 
-    const achievement = response.data
     await interaction.reply({
         content: `:pencil2: Edited achievement \`${achievement.crystal}\`!`,
         embeds: [renderAchievementEmbed(achievement, true)],
@@ -177,7 +177,42 @@ async function handleDelete(interaction: CommandInteraction): Promise<void> {
 }
 
 async function handleView(interaction: CommandInteraction): Promise<void> {
+    const user = await makeUser(interaction.options.get("user")?.user.id ?? interaction.user.id)
 
+    const response = await impressiveRest.get<UnlockFull[]>("/api/unlock-group/v1/", {
+        params: {
+            group: interaction.guildId,
+            user: user.id,
+        }
+    })
+    const data = response.data
+
+    const embeds = data.map(unl => renderUnlockEmbed(unl))
+
+    if(embeds.length === 0) {
+        await interaction.reply({
+            content: ":cloud: This server has no achievements.",
+            ephemeral: true,
+        })
+        return
+    }
+
+    const expectedMessages = Math.ceil(embeds.length / 10)
+    for(let msgNo = 0; msgNo < expectedMessages; msgNo++) {
+        const msgEmbeds = embeds.slice(msgNo * 10, msgNo * 10 + 10)
+        if(msgNo === 0) {
+            await interaction.reply({
+                embeds: msgEmbeds,
+                ephemeral: true,
+            })
+        }
+        else {
+            await interaction.followUp({
+                embeds: msgEmbeds,
+                ephemeral: true,
+            })
+        }
+    }
 }
 
 async function handleUnlock(interaction: CommandInteraction): Promise<void> {
@@ -188,16 +223,12 @@ async function handleUnlock(interaction: CommandInteraction): Promise<void> {
         params: {
             achievement: crystal,
             group: interaction.guildId,
-            user: user,
+            user: user.id,
         }
     })
 
     await interaction.reply({
-        content: `:unlock: Unlocked achievement \`${crystal}\` for <@${user}>!`,
+        content: `:unlock: Unlocked achievement \`${crystal}\` for <@${user.crystal}>!`,
         ephemeral: true,
     })
-}
-
-async function handleRelock(interaction: CommandInteraction): Promise<void> {
-
 }
