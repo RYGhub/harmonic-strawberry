@@ -1,6 +1,6 @@
 {
   "name": "harmonic-strawberry",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Discord interface to impressive-strawberry",
   "main": "src/index.ts",
   "scripts": {
